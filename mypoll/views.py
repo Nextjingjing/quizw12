@@ -42,7 +42,10 @@ class ResultsView(generic.DetailView):
 def vote(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
     try:
-        selected_choice = question.choice_set.get(pk=request.POST["choice"])
+        choice_id = request.POST.get("choice")  # Use .get() to prevent KeyError
+        if choice_id is None:
+            raise KeyError
+        selected_choice = question.choice_set.get(pk=choice_id)
     except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
         return render(
@@ -55,17 +58,9 @@ def vote(request, question_id):
         )
     else:
         selected_choice.votes = F("votes") + 1
-        selected_choice.save()
-        # Always return an HttpResponseRedirect after successfully dealing
-        # with POST data. This prevents data from being posted twice if a
-        # user hits the Back button.
-        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
-    
-def add_ratting(request, question_id):
-    question = get_object_or_404(Question, pk=question_id)
-    try:
         question.rate = F("rate") + 1
         question.save()
-        return HttpResponseRedirect(reverse("polls:vote", args=(question.id,)))
-    except (KeyError, Choice.DoesNotExist):
+        selected_choice.save()
+
+        # Always return an HttpResponseRedirect after dealing with POST data.
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))

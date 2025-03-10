@@ -80,7 +80,8 @@ class VoteViewTests(TestCase):
     def setUp(self):
         self.question = Question.objects.create(
             question_text="Test Question",
-            pub_date=timezone.now()
+            pub_date=timezone.now(),
+            rate = 0
         )
         self.choice1 = Choice.objects.create(
             question=self.question,
@@ -89,16 +90,17 @@ class VoteViewTests(TestCase):
         )
 
     def test_valid_vote(self):
-        """
-        Voting for a choice should increase its vote count.
-        """
         response = self.client.post(
             reverse("polls:vote", args=(self.question.id,)),
             {"choice": self.choice1.id}
-        )
+    )
         self.choice1.refresh_from_db()
+        self.question.refresh_from_db()  
+
         self.assertEqual(self.choice1.votes, 1)
+        self.assertEqual(self.question.rate, 1) 
         self.assertRedirects(response, reverse("polls:results", args=(self.question.id,)))
+
 
     def test_invalid_vote(self):
         """
@@ -109,21 +111,3 @@ class VoteViewTests(TestCase):
             {}
         )
         self.assertContains(response, "You didn't select a choice.", html=True)
-
-class RateTest(TestCase):
-    def setUp(self):
-        self.question = Question.objects.create(
-            question_text="Test Question",
-            pub_date=timezone.now(),
-            rate = 0,
-        )
-    
-    # def test_valid_vote(self):
-    #     """
-    #     add rating.
-    #     """
-    #     response = self.client.get(
-    #         reverse("polls:rate", args=(self.question.id,)),
-    #         {}
-    #     )
-    #     self.assertEqual(self.question.rate, 1)

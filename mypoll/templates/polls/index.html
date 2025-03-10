@@ -2,14 +2,20 @@
 <link rel="stylesheet" href="{% static 'polls/style.css' %}">
 <style>
     li a {
-    color: black;
-}
+        color: black;
+    }
 </style>
 
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
-        <li><a href="{% url 'polls:rate' question.id %}">{{ question.question_text }}</a> Rate: {{question.rate}}</li>
+        {% if question.rate > 50 %}
+            <li>HOT: <a href="{% url 'polls:vote' question.id %}">{{ question.question_text }}</a> Rate: {{ question.rate }}</li>
+        {% elif question.rate > 10 %}
+            <li>WARM:  <a href="{% url 'polls:vote' question.id %}">{{ question.question_text }}</a> Rate: {{ question.rate }}</li>
+        {% else %}
+            <li><a href="{% url 'polls:vote' question.id %}">{{ question.question_text }}</a> Rate: {{ question.rate }}</li>
+        {% endif %}
     {% endfor %}
     </ul>
 {% else %}
