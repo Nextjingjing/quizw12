@@ -109,3 +109,21 @@ class VoteViewTests(TestCase):
             {}
         )
         self.assertContains(response, "You didn't select a choice.", html=True)
+
+class RateTest(TestCase):
+    def setUp(self):
+        self.question = Question.objects.create(
+            question_text="Test Question",
+            pub_date=timezone.now(),
+            rate = 0,
+        )
+    
+    # def test_valid_vote(self):
+    #     """
+    #     add rating.
+    #     """
+    #     response = self.client.get(
+    #         reverse("polls:rate", args=(self.question.id,)),
+    #         {}
+    #     )
+    #     self.assertEqual(self.question.rate, 1)

@@ -60,3 +60,12 @@ def vote(request, question_id):
         # with POST data. This prevents data from being posted twice if a
         # user hits the Back button.
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
+    
+def add_ratting(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    try:
+        question.rate = F("rate") + 1
+        question.save()
+        return HttpResponseRedirect(reverse("polls:vote", args=(question.id,)))
+    except (KeyError, Choice.DoesNotExist):
+        return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
