@@ -111,3 +111,26 @@ class VoteViewTests(TestCase):
             {}
         )
         self.assertContains(response, "You didn't select a choice.", html=True)
+
+class PrivateViewTest(TestCase):
+    def setUp(self):
+        self.question1 = Question.objects.create(
+            question_text="Test Question1",
+            pub_date=timezone.now(),
+            rate = 0,
+            is_private = True
+        )
+
+        self.question2 = Question.objects.create(
+            question_text="Test Question2",
+            pub_date=timezone.now(),
+            rate = 0,
+            is_private = False
+        )
+    def test_private(self):
+        """
+        Questions with a pub_date in the past are displayed on the index page.
+        """
+        # ลบคำถามอนาคตออกเพื่อให้มีแค่คำถามในอดีต
+        response = self.client.get(reverse("polls:private"))
+        self.assertQuerySetEqual(response.context["latest_question_list"], [self.question1])
