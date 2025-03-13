@@ -134,3 +134,26 @@ class PrivateViewTest(TestCase):
         # ลบคำถามอนาคตออกเพื่อให้มีแค่คำถามในอดีต
         response = self.client.get(reverse("polls:private"))
         self.assertQuerySetEqual(response.context["latest_question_list"], [self.question1])
+
+class PrivateDetailViewTest(TestCase):
+    def setUp(self):
+        self.question_pressent = Question.objects.create(
+            question_text="Test Question1",
+            pub_date=timezone.now(),
+            rate = 0,
+            is_private = True
+        )
+
+        self.question_past = Question.objects.create(
+            question_text="Test Question2",
+            pub_date= timezone.now() - datetime.timedelta(days=30),
+            rate = 0,
+            is_private = True
+        )
+    def test_private(self):
+        """
+        Questions with a pub_date in the past are displayed on the index page.
+        """
+        # ลบคำถามอนาคตออกเพื่อให้มีแค่คำถามในอดีต
+        response = self.client.get(reverse("polls:private_detail"))
+        self.assertQuerySetEqual(response.context["latest_question_list"], [self.question_pressent])

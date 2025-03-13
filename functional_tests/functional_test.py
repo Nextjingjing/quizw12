@@ -121,13 +121,25 @@ try:
     if all_tests_passed:
         print("Pass all tests")
 
-    driver.get("http://127.0.0.1:8000/private")
+    driver.get("http://127.0.0.1:8000/private/list/")
     polls_private = WebDriverWait(driver, 10).until(
         EC.presence_of_all_elements_located((By.CSS_SELECTOR, "ul li a"))
     )
     assert len(polls_private) > 0, "No polls available!"
     assert polls_private != polls_after_vote
+    print("Private list pass")
+
+    driver.get("http://127.0.0.1:8000/private/")
+    polls_private1 = WebDriverWait(driver, 10).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "ul li a"))
+    )
+    assert len(polls_private1) == 1, "No polls available!"
+    polls_private1[0].click()
+    choices = driver.find_elements(By.NAME, "choice")
+    assert len(choices) > 0, "No choices available to vote!"
+    choices[0].click()
     print("Private pass")
+
 
 
 except AssertionError as e:
