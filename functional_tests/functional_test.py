@@ -14,7 +14,7 @@ try:
     print("Starting Functional Test...")
 
     # Navigate to /polls/
-    driver.get("http://127.0.0.1:8000/polls/")
+    driver.get("http://127.0.0.1:8000/")
 
     # Wait for polls to appear
     polls = WebDriverWait(driver, 10).until(
@@ -62,7 +62,7 @@ try:
     assert vote_again_link is not None, "Vote again link not found!"
 
     # Go back to polls list
-    driver.get("http://127.0.0.1:8000/polls/")
+    driver.get("http://127.0.0.1:8000/")
 
     # Wait for polls to appear again
     polls_after_vote = WebDriverWait(driver, 10).until(
@@ -120,6 +120,15 @@ try:
 
     if all_tests_passed:
         print("Pass all tests")
+
+    driver.get("http://127.0.0.1:8000/private")
+    polls_private = WebDriverWait(driver, 10).until(
+        EC.presence_of_all_elements_located((By.CSS_SELECTOR, "ul li a"))
+    )
+    assert len(polls_private) > 0, "No polls available!"
+    assert polls_private != polls_after_vote
+    print("Private pass")
+
 
 except AssertionError as e:
     print(f"Assertion Failed: {e}")
